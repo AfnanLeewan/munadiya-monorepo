@@ -1,0 +1,101 @@
+name: 🧪 Integration Test
+
+on:
+  schedule:
+    - cron: '0 22 * * *' # 5:00 AM Asia/Bangkok (UTC+7)
+  pull_request:
+    types: [labeled]
+jobs:
+  integration-test:
+    environment: dev
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'trigger-it-tests'))
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v4
+
+      - name: Setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8.14.0
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install -r
+
+      - name: Install OpenVPN
+        run: |
+          sudo apt update
+          sudo apt install -y openvpn openvpn-systemd-resolved
+
+
+      - name: Connect VPN
+        uses: 'kota65535/github-openvpn-connect-action@v2'
+        with:
+          config_file: .github/workflows/OVPNs/e2e-002.ovpn
+
+      - name: Test VPN Connection
+        run: curl -s https://school-core-api-pre-dev.skilllane.net
+
+      - name: Drop all tables
+        working-directory: ./packages/school-core-api
+        env:
+          DATABASE_PASSWORD: ${{ secrets.IT_DATABASE_PASSWORD }}
+          DATABASE_USERNAME: ${{ secrets.IT_DATABASE_USERNAME }}
+          DATABASE_CONNECT_STRING: ${{ secrets.DATABASE_CONNECT_STRING }}
+        run: pnpm run schema:drop
+
+      - name: Run migration
+        working-directory: ./packages/school-core-api
+        env:
+          DATABASE_PASSWORD: ${{ secrets.IT_DATABASE_PASSWORD }}
+          DATABASE_USERNAME: ${{ secrets.IT_DATABASE_USERNAME }}
+          DATABASE_CONNECT_STRING: ${{ secrets.DATABASE_CONNECT_STRING }}
+        run: pnpm run migration:run
+
+      - name: Seed data
+        working-directory: ./packages/school-core-api
+        env:
+          DATABASE_PASSWORD: ${{ secrets.IT_DATABASE_PASSWORD }}
+          DATABASE_USERNAME: ${{ secrets.IT_DATABASE_USERNAME }}
+          DATABASE_CONNECT_STRING: ${{ secrets.DATABASE_CONNECT_STRING }}
+        run: pnpm run db:seed
+
+      - name: Run integration test
+        working-directory: ./packages/school-core-api
+        env:
+          DATABASE_PASSWORD: ${{ secrets.IT_DATABASE_PASSWORD }}
+          DATABASE_USERNAME: ${{ secrets.IT_DATABASE_USERNAME }}
+          DATABASE_CONNECT_STRING: ${{ secrets.DATABASE_CONNECT_STRING }}
+        run: pnpm run test:it --noStackTrace --forceExit
+
+      - name: Kill VPN Connection
+        if: always()
+        run: |
+          sudo pkill openvpn
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-report
+          path: |
+            ./**/*/integration-test-report*

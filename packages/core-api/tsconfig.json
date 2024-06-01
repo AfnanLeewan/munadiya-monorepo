@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  },
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    // Generates corresponding '.d.ts' file
+    "declaration": true,
+    // Save .tsbuildinfo file to speed up subsequent builds
+    "incremental": true,
+    "paths": {
+      "@common/*": ["./src/common/*"],
+      "@database/*": ["./src/database/*"],
+      "@domain/*": ["./src/domain/*"]
+    }
+  }
+}

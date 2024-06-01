@@ -1,0 +1,96 @@
+name: 🧪 School E2E Test
+run-name: 'SCHOOL-E2E-Automated-Test #${{ github.run_number }} - ${{ github.ref_name }}'
+
+on:
+  schedule:
+    - cron: '0 22 * * *' # 5:00 AM Asia/Bangkok (UTC+7)
+  pull_request:
+    types: [labeled]
+
+jobs:
+  playwright:
+    name: 'Playwright Tests'
+    environment: dev
+    if: github.event_name == 'schedule' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'trigger-e2e'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        id: checkout
+        uses: actions/checkout@v2.3.3
+        with:
+          fetch-depth: 0
+      - name: Setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8.14.0
+          run_install: false
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      - name: 🧩 Install Dependencies
+        id: install-dependencies
+        run: pnpm install -r
+      - name: Install Playwright Browsers
+        working-directory: ./packages/school-e2e-tests
+        run: npx playwright install --with-deps
+
+      - name: Install OpenVPN
+        run: |
+          sudo apt update
+          sudo apt install -y openvpn openvpn-systemd-resolved
+      - name: Connect VPN
+        uses: 'kota65535/github-openvpn-connect-action@v2'
+        with:
+          config_file: .github/workflows/OVPNs/e2e-001.ovpn
+      - name: End-to-End Preparation
+        working-directory: ./packages/school-core-api
+        env:
+          DATABASE_PASSWORD: ${{ secrets.E2E_DATABASE_PASSWORD }}
+          DATABASE_USERNAME: ${{ secrets.E2E_DATABASE_USERNAME }}
+          DATABASE_CONNECT_STRING: ${{ secrets.DATABASE_CONNECT_STRING }}
+        run: 
+          pnpm run e2e-preparation
+
+      - name: 🧪 Run your tests
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          TEST_MAIL_API_KEY: ${{ secrets.TEST_MAIL_API_KEY }}
+        run: |
+          export TZ='Asia/Bangkok'
+          cd ./packages/school-e2e-tests
+          pnpm playwright test  ./tests --project Chrome
+
+      - name: Read Summary Report to Get Test Results
+        if: always()
+        working-directory: ./packages/school-e2e-tests
+        run: |
+          STATUS=$(cat ./summary.json | jq -r '.status')
+          echo "STATUS=$STATUS" >> $GITHUB_ENV 
+          PASSED=$(cat ./summary.json | jq -r '.passed[]' | tr '\n' ' ')
+          echo "PASSED=$PASSED" >> $GITHUB_ENV 
+          TIMEOUT=$(cat ./summary.json | jq -r '.timedOut[]' | tr '\n' ' ' | sed 's/ /--->TIMEOUT /g')
+          FAILURES=$(cat ./summary.json | jq -r '.failed[]' | tr '\n' ' ')
+          FAILURES+=$TIMEOUT
+          echo "FAILURES=$FAILURES" >> $GITHUB_ENV
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: ./packages/school-e2e-tests/playwright-report
+      - name: Kill VPN Connection
+        if: always()
+        run: |
+          sudo pkill openvpn

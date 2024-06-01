@@ -1,0 +1,64 @@
+name: 🗳️ [stg/qa] - Docker Build & Push
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag'
+        required: true
+
+      environment:
+        description: 'Environment to push docker image to'
+        required: true
+        default: 'qa'
+        type: choice
+        options:
+          - qa
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2.3.3
+
+      - name: 🟢 Setup node
+        id: setup-node
+        uses: actions/setup-node@v4
+
+      - name: 🛠️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: 🔑 Login to GCP Registry
+        run: |
+          gcloud auth configure-docker
+
+      - name: 🏗️ Validate & Push docker image
+        run: |
+          npx zx ./scripts/dispatch_docker_deploy.mjs --releaseTag="${{ github.event.inputs.release_tag }}" --env="${{ github.event.inputs.environment }}"
+
+      - name: Set release output
+        id: set_release
+        run: |
+          releaseTag=${{ github.event.inputs.release_tag }}
+          name=${releaseTag%@*}
+          version=${releaseTag#*@}
+          echo "result=[{\"name\":\"$name\",\"version\":\"$version\"}]" >> $GITHUB_OUTPUT
+      
+      - name: Deploy
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: SkillLane/pluton-non-prod-infra
+          event-type: deployment_update
+          client-payload: '{"packages": ${{ steps.set_release.outputs.result }}, "env": "${{ github.event.inputs.environment }}" }'
+

@@ -1,0 +1,138 @@
+{
+  "name": "school-web",
+  "private": true,
+  "version": "2.26.3",
+  "type": "module",
+  "files": [
+    "dist",
+    "config"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "build": "vite build",
+    "test": "vitest run --typecheck.enabled",
+    "coverage": "vitest run --coverage --logHeapUsage --typecheck.enabled --silent",
+    "coverage:lite": "vitest run --coverage --logHeapUsage --typecheck.enabled --minWorkers=1 --maxWorkers=2 --silent",
+    "test:snap": "vitest run --u --typecheck.enabled --silent",
+    "test:file": "vitest run --w --typecheck.enabled --t",
+    "format:check": "prettier --check \"index.html\" \"src/**/*.{ts,tsx}\"",
+    "format:write": "prettier --write \"index.html\" \"src/**/*.{ts,tsx}\"",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/pro-light-svg-icons": "^6.5.1",
+    "@fortawesome/pro-regular-svg-icons": "^6.5.1",
+    "@fortawesome/pro-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@hookform/resolvers": "^3.3.4",
+    "@mui/icons-material": "^5.15.5",
+    "@mui/lab": "5.0.0-alpha.166",
+    "@mui/material": "^5.15.4",
+    "@mui/x-date-pickers": "^6.19.4",
+    "@tanstack/react-query": "^4.35.0",
+    "@tanstack/react-query-devtools": "^4.36.1",
+    "@vidstack/react": "^1.10.9",
+    "@xeger/quill-image-actions": "^0.7.2",
+    "@xeger/quill-image-formats": "^0.7.2",
+    "axios": "^1.6.5",
+    "buffer": "^6.0.3",
+    "dayjs": "^1.11.10",
+    "file-saver": "^2.0.5",
+    "firebase": "^10.7.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "hls.js": "^1.5.6",
+    "i18next": "^23.8.2",
+    "js-cookie": "^3.0.5",
+    "jszip": "^3.10.1",
+    "lodash": "^4.17.21",
+    "media-icons": "^0.10.0",
+    "notistack": "^3.0.1",
+    "path-to-regexp": "^6.2.1",
+    "pdfjs-dist": "3.11.174",
+    "query-string": "^8.1.0",
+    "react": "^18.2.0",
+    "react-beautiful-dnd": "^13.1.1",
+    "react-documents": "^1.2.1",
+    "react-dom": "^18.2.0",
+    "react-easy-crop": "^5.0.5",
+    "react-google-recaptcha": "^3.1.0",
+    "react-hook-form": "^7.49.3",
+    "react-i18next": "^14.0.5",
+    "react-pageflip": "^2.0.3",
+    "react-player": "^2.14.1",
+    "react-quill": "^2.0.0",
+    "react-router-dom": "^6.21.2",
+    "swiper": "^11.0.6",
+    "uuid": "^9.0.1",
+    "vidstack": "^0.6.14",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "nock": "^13.5.4",
+    "@types/pako": "^2.0.3",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/js-cookie": "^3.0.6",
+    "@types/lodash": "^4.14.202",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@types/react-google-recaptcha": "^2.1.9",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/coverage-v8": "^1.6.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "jsdom": "^24.0.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8",
+    "vite-plugin-svgr": "^4.2.0",
+    "vitest": "^1.6.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2020": true
+    },
+    "settings": {
+      "import/resolver": {
+        "typescript": {}
+      }
+    },
+    "parserOptions": {
+      "project": "./tsconfig.json",
+      "sourceType": "module"
+    },
+    "extends": [
+      "../../.eslintrc.js",
+      "plugin:react-hooks/recommended"
+    ],
+    "plugins": [
+      "react-refresh"
+    ],
+    "rules": {
+      "react-refresh/only-export-components": [
+        "warn",
+        {
+          "allowConstantExport": true
+        }
+      ]
+    },
+    "ignorePatterns": [
+      "dist"
+    ]
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix"
+    ],
+    "*.{html,css,json,md}": [
+      "prettier --write"
+    ]
+  }
+}

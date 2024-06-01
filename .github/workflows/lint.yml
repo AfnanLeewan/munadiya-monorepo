@@ -1,0 +1,90 @@
+name: 🚧 Lint
+
+on: pull_request
+
+jobs:
+
+  determine-changed-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v4
+
+      - name: Setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Determine Changed Packages
+        id: determine_change_package
+        shell: bash
+        env:
+          TARGET_BRANCH: ${{ github.base_ref }}
+        run: |
+          echo "::group::Determining Changed Packages"
+          output=$(npx zx ./scripts/determine_changed_package.mjs)
+          echo "Packages need to rebuild: $output"
+          echo "::endgroup::"
+          echo "PACKAGES=$output" >> $GITHUB_OUTPUT
+
+    outputs:
+      packages: ${{ steps.determine_change_package.outputs.PACKAGES }}
+
+  check-and-build:
+    needs: determine-changed-packages
+    runs-on: ubuntu-latest
+    if: ${{ needs.determine-changed-packages.outputs.packages != '[]'}}
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{fromJson(needs.determine-changed-packages.outputs.packages)}}
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v4
+
+      - name: Setup node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 8.14.0
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install -r
+
+      - name: Lint check and Build Package
+        run: |
+          echo "Processing ${{ matrix.package }}"
+          export NODE_OPTIONS="--max-old-space-size=4096"
+          pnpm --filter ${{ matrix.package }} lint &&
+          pnpm --filter ${{ matrix.package }} typecheck &&
+          pnpm --filter ${{ matrix.package }} build
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: check-and-build
+    if: ${{ always() }}
+    steps:
+      - name: Lint check build status
+        run: |
+          if [[ "${{ needs.check-and-build.result }}" != "success" && "${{ needs.check-and-build.result }}" != "skipped" ]]; then
+            echo "There is a package that build failed or was cancelled, failing lint job."
+            exit 1
+          fi

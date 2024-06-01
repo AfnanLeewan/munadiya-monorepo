@@ -1,0 +1,39 @@
+{
+  "name": "pluton-monorepo",
+  "version": "0.0.1",
+  "description": "Mono repository for pluton project",
+  "packageManager": "pnpm@9.1.2",
+  "scripts": {
+    "test": "pnpm -r --parallel --stream run test",
+    "build": "pnpm typecheck && pnpm -r --stream run build",
+    "lint": "pnpm -r --stream run lint",
+    "format:check": "pnpm -r --stream run format:check",
+    "format:write": "pnpm -r --stream run format:write",
+    "typecheck": "pnpm -r --stream run typecheck",
+    "prepare": "husky install",
+    "commitlint": "commitlint --edit",
+    "ci:publish": "changeset publish",
+    "ci:version": "changeset version"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.5.0",
+    "@changesets/cli": "^2.27.1",
+    "@commitlint/cli": "^18.4.4",
+    "@commitlint/config-conventional": "^18.4.4",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-jest": "^27.6.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.0.0"
+  }
+}

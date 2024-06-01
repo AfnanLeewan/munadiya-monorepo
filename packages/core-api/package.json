@@ -1,0 +1,183 @@
+{
+  "name": "school-core-api",
+  "version": "10.26.1",
+  "description": "Core API for school web application",
+  "author": "",
+  "private": true,
+  "license": "UNLICENSED",
+  "files": [
+    "dist",
+    "assets",
+    "uploads"
+  ],
+  "scripts": {
+    "build": "nest build",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:write": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/src/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "schema:log": "typeorm-ts-node-commonjs -d src/database/datasource.ts schema:log",
+    "schema:drop": "typeorm-ts-node-commonjs -d src/database/datasource.ts schema:drop",
+    "migration:show": "typeorm-ts-node-commonjs -d src/database/datasource.ts migration:show",
+    "migration:run": "typeorm-ts-node-commonjs -d src/database/datasource.ts migration:run",
+    "migration:revert": "typeorm-ts-node-commonjs -d src/database/datasource.ts migration:revert",
+    "migration:generate": "cd src/database/migrations && typeorm-ts-node-commonjs -d ../datasource.ts migration:generate",
+    "migration:create": "cd src/database/migrations && typeorm migration:create",
+    "db:seed": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/datasource.ts --name src/database/seeds/db.seeder.ts",
+    "system-user:seed": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/datasource.ts --name src/database/seeds/system-user.seeder.ts",
+    "policy:seed": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/datasource.ts --name src/database/seeds/policy.seeder.ts",
+    "grade-level:seed": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/datasource.ts --name src/database/seeds/grade-level.seeder.ts",
+    "grade-criteria:seed": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/datasource.ts --name src/database/seeds/grade-criteria.seeder.ts",
+    "timetable-config:seed": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/datasource.ts --name src/database/seeds/timetable-config.seeder.ts",
+    "prepare-e2e:seed": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/datasource.ts --name src/database/seeds/prepare-e2e.seeder.ts",
+    "teaching-plan-e2e:seed": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/datasource.ts --name src/database/seeds/teaching-plan-e2e.seeder.ts",
+    "teaching-plan-sql-e2e:seed": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./node_modules/typeorm-extension/bin/cli.cjs seed:run -d src/database/datasource.ts --name src/database/seeds/teaching-plan-sql-e2e.seeder.ts",
+    "test:it": "jest --config test/config/jest-it.json --detectOpenHandles --forceExit",
+    "test:it-local": "jest --config test/config/jest-it-local.json --runInBand",
+    "e2e-preparation": "pnpm run schema:drop && pnpm run migration:run && pnpm run prepare-e2e:seed && pnpm run system-user:seed && pnpm run policy:seed",
+    "scripts:delete-firebase-users": "ts-node -r tsconfig-paths/register --project ./tsconfig.json ./scripts/delete-firebase-users.ts"
+  },
+  "dependencies": {
+    "@bull-board/api": "^5.14.0",
+    "@bull-board/express": "^5.14.0",
+    "@bull-board/nestjs": "^5.14.0",
+    "@elastic/ecs-pino-format": "^1.5.0",
+    "@faker-js/faker": "^8.4.1",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@nestjs/axios": "^3.0.1",
+    "@nestjs/bull": "^10.0.1",
+    "@nestjs/bullmq": "^10.1.0",
+    "@nestjs/cache-manager": "^2.2.0",
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.1.1",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/cqrs": "^10.2.6",
+    "@nestjs/jwt": "^10.2.0",
+    "@nestjs/mapped-types": "^2.0.4",
+    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/swagger": "^7.2.0",
+    "@nestjs/typeorm": "^10.0.1",
+    "axios": "^1.6.5",
+    "body-parser": "^1.20.2",
+    "bull": "^4.12.2",
+    "bullmq": "^5.1.9",
+    "cache-manager": "^5.4.0",
+    "cache-manager-redis-yet": "^4.1.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "dayjs": "^1.11.10",
+    "dotenv": "^16.3.2",
+    "elastic-apm-node": "^4.5.0",
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "firebase-admin": "^12.0.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "handlebars": "^4.7.8",
+    "ioredis": "^5.3.2",
+    "lodash": "^4.17.21",
+    "multer": "1.4.5-lts.1",
+    "nestjs-cls": "^4.0.3",
+    "nodemailer": "^6.9.8",
+    "oracledb": "^6.4.0",
+    "path-to-regexp": "^6.2.1",
+    "pdfmake": "^0.2.9",
+    "pino": "^8.20.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.19",
+    "typeorm-extension": "^3.5.0",
+    "typeorm-naming-strategies": "^4.1.0",
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5",
+    "zlib": "^1.0.5"
+  },
+  "devDependencies": {
+    "@types/pako": "^2.0.3",
+    "@types/pino": "^7.0.5",
+    "@faker-js/faker": "^8.4.1",
+    "@golevelup/ts-jest": "^0.4.0",
+    "@jest/reporters": "^29.7.0",
+    "@jest/test-result": "^29.7.0",
+    "@nestjs/cli": "^10.0.0",
+    "@nestjs/schematics": "^10.0.0",
+    "@nestjs/testing": "^10.0.0",
+    "@types/express": "^4.17.17",
+    "@types/fluent-ffmpeg": "^2.1.24",
+    "@types/jest": "^29.5.2",
+    "@types/lodash": "^4.14.202",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.3.1",
+    "@types/nodemailer": "^6.4.14",
+    "@types/pdfmake": "^0.2.9",
+    "@types/supertest": "^2.0.12",
+    "@types/uuid": "^9.0.7",
+    "jest": "^29.5.0",
+    "source-map-support": "^0.5.21",
+    "supertest": "^6.3.3",
+    "testcontainers": "^10.7.2",
+    "ts-jest": "^29.1.0",
+    "ts-loader": "^9.4.3",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node",
+    "modulePaths": [
+      "<rootDir>/src/"
+    ],
+    "moduleNameMapper": {
+      "^@common/(.*)$": "<rootDir>/common/$1",
+      "^@database/(.*)$": "<rootDir>/database/$1",
+      "^@domain/(.*)$": "<rootDir>/domain/$1",
+      "^src/(.*)": "<rootDir>/$1",
+      "^assets/(.*)": "<rootDir>/../assets/$1"
+    }
+  },
+  "eslintConfig": {
+    "extends": "../../.eslintrc.js",
+    "parserOptions": {
+      "project": "tsconfig.json",
+      "sourceType": "module"
+    },
+    "env": {
+      "node": true,
+      "jest": true
+    },
+    "rules": {
+      "jest/expect-expect": "off",
+      "@typescript-eslint/no-floating-promises": "error"
+    }
+  },
+  "lint-staged": {
+    "*.{ts}": [
+      "eslint --fix"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
+}

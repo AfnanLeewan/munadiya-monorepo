@@ -1,0 +1,168 @@
+name: 🚀 Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/school-core-api/**'
+      - 'packages/school-web/**'
+
+jobs:
+  release:
+    name: 🚀 Release
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [lts/*]
+        pnpm-version: [8.14.0]
+    runs-on: ${{ matrix.os }}
+    outputs:
+      published: ${{ steps.changesets.outputs.published }}
+      published_packages: ${{ steps.changesets.outputs.publishedPackages }}
+
+    steps:
+      - name: ⬇️ Checkout
+        id: checkout
+        uses: actions/checkout@v2.3.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 🟢 Setup node
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: 🥡 Setup pnpm
+        id: setup-pnpm
+        uses: pnpm/action-setup@v2.1.0
+        with:
+          version: ${{ matrix.pnpm-version }}
+          run_install: false
+
+      - name: 🎈 Get pnpm store directory
+        id: get-pnpm-cache-dir
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - name: 🔆 Cache pnpm modules
+        uses: actions/cache@v3
+        id: pnpm-cache
+        with:
+          path: ${{ steps.get-pnpm-cache-dir.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 🧩 Install Dependencies
+        id: install-dependencies
+        run: pnpm install
+
+      - name: 🏗️ Build
+        id: build-the-mono-repo
+        run: |
+          export NODE_OPTIONS="--max-old-space-size=4096"
+          pnpm build
+
+      - name: 📣 Create Release Pull Request or Publish
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          title: 'chore(release): version packages 🦋'
+          publish: pnpm ci:publish
+          version: pnpm ci:version
+          commit: 'chore(release): version packages 🦋 [skip ci]'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  build_and_push_image:
+    name: 🗳️ [dev] - Docker Build & Push
+    needs: release
+    if: needs.release.outputs.published == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        id: checkout
+        uses: actions/checkout@v2.3.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 🟢 Setup node
+        id: setup-node
+        uses: actions/setup-node@v4
+
+      - name: 🛠️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: 🔑 Login to GCP Registry
+        run: |
+          gcloud auth configure-docker
+
+      - name: 🏗️ Docker Build & Push
+        run: |
+          npx zx ./scripts/docker_build_and_push.mjs --env=dev --packages='${{ needs.release.outputs.published_packages }}'
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - build_and_push_image
+      - release
+    if: needs.release.outputs.published == 'true'
+    steps:
+      - name: Deploy
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT }}
+          repository: SkillLane/pluton-non-prod-infra
+          event-type: deployment_update
+          client-payload: '{"packages": ${{ needs.release.outputs.published_packages }}, "env": "dev"}'
+    
+  send_discord_notification:
+    name: 🔔 Send Discord Notification
+    needs: deploy
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        id: checkout
+        uses: actions/checkout@v2.3.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 🔍 Get Discord Message
+        id: discord_message
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = (
+                await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                  commit_sha: context.sha,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo
+                })
+              ).data[0]
+
+            const description = pr.body.match(/^# Releases[\s\S]*$/gm)[0]
+
+            return [{ title: pr.title, description, color: 8652790 }]
+
+      - name: 🤖 Send Discord Notification
+        env:
+          DISCORD_USERNAME: "🤖 Pluton Bot"
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_EMBEDS: ${{ steps.discord_message.outputs.result }}
+        uses: Ilshidur/action-discord@master
+        with:
+          args: '**New Release Update 🚀**'
