@@ -2,6 +2,8 @@
 
 Munadiya project mono repository
 
+front-end : package/web
+back-end : package/core-api
 ## Overview
 1. Install dependencies for all `/packages/*` recursively
 
