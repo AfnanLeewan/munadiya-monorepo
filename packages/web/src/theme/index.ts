@@ -158,7 +158,12 @@ export const theme = createTheme({
       light: 'rgba(52, 132, 240, 0.08)',
     },
     main: {
-      main: '#3486F0',
+      main: '#F0C555',
+      light: '#3486F0',
+      dark: '#68B4FF',
+    },
+    secondary:{
+      main: '#D24D3C',
       light: '#3486F0',
       dark: '#68B4FF',
     },

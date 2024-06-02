@@ -11,6 +11,7 @@ module.exports = {
   ignorePatterns: ['.eslintrc.js', 'node_modules', 'dist', 'scripts'],
   rules: {
     'no-await-in-loop': 'off',
+    'prettier/prettier': 'off',
     'import/prefer-default-export': 'off',
     'class-methods-use-this': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
