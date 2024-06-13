@@ -1,6 +1,7 @@
 import { SimplePaletteColorOptions, createTheme } from '@mui/material'
 
-const bodyFont = 'Sarabun'
+const bodyFont = 'Prompt'
+const fontArabic = 'font'
 
 declare module '@mui/material' {
   interface BreakpointOverrides {
