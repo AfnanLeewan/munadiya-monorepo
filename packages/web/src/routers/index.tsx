@@ -2,6 +2,7 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 import HomePageTemplate from '@/component/template/HomePageTemplate.react'
 import HomePage from '@/component/pages/HomePage.react'
+import ArticlePage from '@/component/pages/Article.react'
 
 const router = createBrowserRouter([
   {
@@ -27,7 +28,7 @@ const router = createBrowserRouter([
       },
       {
         path: 'article',
-        element: <HomePage/>,
+        element: <ArticlePage />,
       },
       {
         path: 'video',
