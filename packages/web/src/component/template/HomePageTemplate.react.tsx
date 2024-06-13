@@ -8,7 +8,6 @@ export default function HomePageTemplate() {
   return (
     <Box
       width="100%"
-      height="10000px"
       bgcolor={theme.palette.gray.light}
       sx={{
         overflowX: 'hidden',
