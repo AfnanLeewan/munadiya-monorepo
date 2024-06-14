@@ -78,19 +78,19 @@ export default function Navbar(props: Props) {
           <Typography
             variant="h6"
             component="div"
-            sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block',fontWeight:800 } }}
+            sx={{ flexGrow: 1, display: {fontSize:'24px', xs: 'none', sm: 'block',fontWeight:800 } }}
           >
             MUNADIYA
           </Typography>
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {navItems.map((item) => (
-              <Button key={item.label}  sx={{ color: '#000' }} onClick={()=>{
+              <Button key={item.label}  sx={{ fontSize:'18px',color: '#000' }} onClick={()=>{
                 navigate(`/${item.path}`)
               }}>
                 {item.label}
               </Button>
             ))}
-              <Button  sx={{ color: '#000' }} >
+              <Button sx={{ fontSize:'18px' , color: '#000' }} >
                 เกี่ยวกับเรา
               </Button>
           </Box>

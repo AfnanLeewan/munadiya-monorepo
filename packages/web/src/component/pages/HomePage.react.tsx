@@ -1,8 +1,3 @@
-<<<<<<< Updated upstream
-function HomePage() {
-  return (
-    <div>This is HomePages</div>
-=======
 import {
   Box,
   Button,
@@ -20,9 +15,13 @@ import {
   faChevronCircleLeft,
   faChevronCircleRight,
   faCircle,
+  faMicrophone,
+  faPlayCircle,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import cover from '../../../../../assets/images/cover.jpg'
 import book from '../../../../../assets/images/book1.png'
+import article from '../../../../../assets/images/article.jpg'
 import { theme } from '@/theme'
 
 const CATAGORY_BOOK_AMOUNT = 7
@@ -48,10 +47,25 @@ const CATAGORY_BOOK = {
   total: 7,
 }
 const RECOMMEND_BOOK = [book, book, book]
+const RECOMMEND_ARTICLE = [article, article, article, article]
 function HomePage() {
   const images = [{ url: cover }, { url: 'cover.jpg' }, { url: 'images/3.jpg' }]
+  const YoutubeEmbed = () => (
+    <Box>
+      <iframe
+        width="700"
+        height="450"
+        src={`https://www.youtube.com/embed/G7e3kgahJ4g`}
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        title="Embedded youtube"
+      />
+    </Box>
+  )
+
   return (
-    <Stack>
+    <Stack >
       <Box>
         <SimpleImageSlider
           width="100%"
@@ -143,6 +157,16 @@ function HomePage() {
           />
         </Button>
       </Box>
+      <Box
+        mt={5}
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        gap={2}
+      >
+
+      </Box>
       <Box>
         <Box mt={2} display="flex" justifyContent="center" gap={1}>
           <FontAwesomeIcon color={theme.palette.main.main} icon={faCircle} />
@@ -190,17 +214,182 @@ function HomePage() {
       >
         Ebooks สำหรับดาวน์โหลดฟรี
       </Typography>
-      <Box>
-        <Typography color={theme.palette.secondary.main} variant="heading1">
-          บทความ
-        </Typography>
-        <Typography variant="h6" sx={{ width: '800px' }}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
-          tincidunt dolor eget quam viverra, scelerisque sollicitudin lectus
-        </Typography>
+
+      <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center'>
+      <Box mx="10%" display="flex" my={10} gap={10}>
+        <Box>
+          <YoutubeEmbed />
+        </Box>
+        <Box mt={10}>
+          <Box display="flex" alignItems="center" gap={3}>
+            <Typography color={theme.palette.main.main} variant="heading1">
+              วิดีโอ
+            </Typography>
+            <FontAwesomeIcon
+              color={theme.palette.main.main}
+              size="5x"
+              icon={faPlayCircle}
+            />
+          </Box>
+          <Typography variant="h6" sx={{ width: '600px' }}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+            tincidunt dolor eget quam viverra, scelerisque sollicitudin lectus
+          </Typography>
+          <Button
+            sx={{
+              bgcolor: theme.palette.main.main,
+              gap: 1,
+              borderRadius: 3,
+              my: 3,
+              color: 'white',
+              fontSize: 20,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+            <Typography variant="h6" color="white">
+              เพิ่มเติม
+            </Typography>
+          </Button>
+        </Box>
+      </Box>
+      <Box mx="10%" display="flex" my={10} gap={10}>
+        <Box mt={10}>
+          <Box display="flex" alignItems="center" gap={3}>
+            <Typography color={theme.palette.secondary.main} variant="heading1">
+              พอดแคส
+            </Typography>
+            <FontAwesomeIcon
+              color={theme.palette.secondary.main}
+              size="5x"
+              icon={faMicrophone}
+            />
+          </Box>
+          <Typography variant="h6" sx={{ width: '800px' }}>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis
+            tincidunt dolor eget quam viverra, scelerisque sollicitudin lectus
+          </Typography>
+          <Button
+            sx={{
+              bgcolor: theme.palette.secondary.main,
+              gap: 1,
+              borderRadius: 3,
+              my: 3,
+              color: 'white',
+              fontSize: 20,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+            <Typography variant="h6" color="white">
+              เพิ่มเติม
+            </Typography>
+          </Button>
+        </Box>
+        <Box display="flex" flexDirection="column" gap={3}>
+          <Paper
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              padding: 3,
+              bgcolor: 'white',
+            }}
+          >
+            <FontAwesomeIcon
+              color={theme.palette.secondary.main}
+              size="3x"
+              icon={faMicrophone}
+            />
+            <Typography variant="h6" sx={{ width: '400px' }}>
+              Lorem ipsum dolor sit amet,
+            </Typography>
+          </Paper>
+          <Paper
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              padding: 3,
+              bgcolor: 'white',
+            }}
+          >
+            <FontAwesomeIcon
+              color={theme.palette.secondary.main}
+              size="3x"
+              icon={faMicrophone}
+            />
+            <Typography variant="h6" sx={{ width: '400px' }}>
+              Lorem ipsum dolor sit amet,
+            </Typography>
+          </Paper>
+          <Paper
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
+              padding: 3,
+              bgcolor: 'white',
+            }}
+          >
+            <FontAwesomeIcon
+              color={theme.palette.secondary.main}
+              size="3x"
+              icon={faMicrophone}
+            />
+            <Typography variant="h6" sx={{ width: '400px' }}>
+              Lorem ipsum dolor sit amet,
+            </Typography>
+          </Paper>
+        </Box>
+      </Box>
+      </Box>
+      <Box
+        mt={5}
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        gap={2}
+      >
+        <Typography variant="heading1">พวกเราคือใคร ?</Typography>
+        <Box
+          p="10%"
+          display="flex"
+          width="100"
+          flexDirection="column"
+          gap={6}
+          mt={5}
+          bgcolor="#F2F0F0"
+        >
+          <Typography variant="h4" align="center">
+            “พวกเราคือคนกลุ่มเล็กๆ ที่มีความฝัน
+            และอุดมการณ์ที่จะสร้างมาตรฐานการเรียนรู้อิสลามอย่างเป็นรูปธรรมให้เกิดขึ้นในประเทศไทย”
+          </Typography>
+          <Typography variant="h4" align="center">
+            งานของเรา คือ
+            การถ่ายทอดองค์ความรู้วิชาการศาสนาที่นักวิชาการแนะนำมาสู่ภาษาไทย
+            ผ่านการสอนอย่างเป็นระบบและงานแปล โดยทำการคัดเลือกอย่างเป็นขั้นตอน
+            ให้เหมาะสมกับสถานะของผู้เรียน ตามคำแนะนำของนักวิชาการอิสลาม
+          </Typography>
+        </Box>
+      </Box>
+      <Box
+        m={5}
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        gap={2}
+      >
+        <Typography variant="heading1">ติดต่อเรา</Typography>
+        <Typography variant="h4">Facebook : XXXXXXXX</Typography>
+        <Typography variant="h4">Telephone : 0XX-XXX-XXXX</Typography>
+        <Typography variant="h4">Email : munadiya@email.com</Typography>
       </Box>
     </Stack>
->>>>>>> Stashed changes
   )
 }
 

@@ -38,6 +38,10 @@ const router = createBrowserRouter([
         path: 'podcast',
         element: <HomePage/>,
       },
+      {
+        path: 'podcast',
+        element: <HomePage/>,
+      },
     ],
   },
 ])
