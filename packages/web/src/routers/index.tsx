@@ -2,7 +2,7 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 import HomePageTemplate from '@/component/template/HomePageTemplate.react'
 import HomePage from '@/component/pages/HomePage.react'
-import ArticlePage from '@/component/pages/Article.react'
+import ArticlePage from '@/component/pages/(article)/ArticlePage.react'
 
 const router = createBrowserRouter([
   {
